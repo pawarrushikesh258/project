@@ -1,14 +1,11 @@
 var http = require('http');
-
-// http.createServer(function (req, res) {
-//     res.writeHead(200, {'Content-Type': 'text/html'});
-//     res.end('Hello World!');
-// }).listen(8080);
+var path = require('path');
 var Express = require('express');
 var multer = require('multer');
 var bodyParser = require('body-parser');
 var app = Express();
-app.use(bodyParser.json());
+
+app.use(Express.static(path.join(__dirname, "js")));
 var fs = require("fs");
 
 // var Storage = multer.diskStorage({
