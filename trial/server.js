@@ -6,18 +6,10 @@ var bodyParser = require('body-parser');
 var app = Express();
 
 app.use(Express.static(path.join(__dirname, "js")));
+app.use(Express.static(path.join(__dirname, "css")));
 var fs = require("fs");
 
-// var Storage = multer.diskStorage({
-//     destination: function (req, file, callback) {
-//         callback(null, "./Images");
-//     },
-//     filename: function (req, file, callback) {
-//         callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
-//     }
-// });
-
- var upload = multer().single('imgUploader'); //Field name and max count
+var upload = multer().single('imgUploader'); //Field name and max count
 
 
 app.get("/", function (req, res) {
@@ -48,46 +40,38 @@ app.post("/api/Upload", function (req, res) {
             console.log(err);
             return res.end("Something went wrong!");
         }
-        //for(var i = 0; i < req.files.length; i++) {
-        // var i = 0;
-            fileInfo.push({
-                "src": 'data:image/jpeg;base64,'+new Buffer(req.file.buffer).toString("base64")
-            });
-            //fs.unlink(req.file.path);
-        // //}
-
-       var post_req =   http.request(options, function(res) {
-          console.log('STATUS: ' + res.statusCode);
-          console.log('HEADERS: ' + JSON.stringify(res.headers));
-          res.setEncoding('utf8');
-          res.on('data', function (chunk) {
-            console.log('BODY: ' + chunk);
-          });
+        fileInfo.push({
+            "src": 'data:image/jpeg;base64,'+new Buffer(req.file.buffer).toString("base64")
         });
 
-        console.log(JSON.stringify(fileInfo[0]));
+       var post_req =   http.request(options, function(resp) {
+          console.log('STATUS: ' + res.statusCode);
+          console.log('HEADERS: ' + JSON.stringify(res.headers));
+          resp.setEncoding('utf8');
+          var body ='';
+          resp.on('data', function (chunk) {
+            console.log('BODY: ' + chunk);
+            body = chunk;
+            body = JSON.parse(body);
+            if (body.error) {
+              res.send(body.error);
+            }
+            else {
+              res.send(body.latex)
+            }
+          });
+
+        });
+
+      //  console.log(JSON.stringify(fileInfo[0]));
         post_req.write(JSON.stringify(fileInfo[0]));
         post_req.end();
 
-        return res.end("File uploaded sucessfully!.");
+
+      //  return res.end("File uploaded sucessfully!.");
       });
     });
 //});
-
-// app.post('/api/Upload"', upload.single('avatar'), (req, res) => {
-//   if (!req.file) {
-//     console.log("No file received");
-//     return res.send({
-//       success: false
-//     });
-//
-//   } else {
-//     console.log('file received');
-//     return res.send({
-//       success: true
-//     })
-//   }
-// });
 
 
 

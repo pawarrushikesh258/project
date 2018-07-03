@@ -5,11 +5,9 @@
   <meta charset="utf8" />
   <meta name="author" content="Luis Leiva" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" type="text/css" href="index.css">
 
-  <title>jSketch (jQuery plugin) demo</title>
-  <!-- <link rel="icon" href="favicon.png?t=1525741857" /> -->
-
-  <!-- <link type="text/css" rel="stylesheet" media="all" href="css/styles-index.css?t=1525741857" /> -->
+  <title>Mathematical Expression Recognize Demo</title>
 
 
 
@@ -19,18 +17,11 @@
   <script type="application/javascript" src="sketchable.full.min.js"></script>
   <script type="application/javascript" src="sketchable.memento.min.js"></script>
 
-  <!-- jQuery version, separate source files. Obviously requires jQuery to be loaded first. -->
+
   <script type="application/javascript" src="jquery-1.7.2.min.js"></script>
   <script type="application/javascript" src="jquery.sketchable.full.min.js"></script>
   <script type="application/javascript" src="jquery.sketchable.memento.min.js"></script>
   <script type="application/javascript" src="jquery.sketchable.min.js"></script>
-  <!--
-  <script type="text/javascript" src="js/jquery.sketchable.smoothy.js?t=1525741857"></script>
-  -->
-
-  <!-- Highlight source code. -->
-    <!-- <link type="text/css" rel="stylesheet" media="all" href="css/prism.css" />
-  <script src="js/vendor/prism.js"></script> -->
 
 </head>
 
@@ -38,7 +29,7 @@
 
 
   <div id="header">
-    <h1><a href="index.php">jSketch</a></h1>
+    <h1>Mathematical Expression Recognize Demo</a></h1>
   </div>
 
 
@@ -51,16 +42,17 @@
           <input type="radio" name="brush" id="brush-pencil" value="Pencil" checked="checked" />
           Pencil
         </label>
-        <label>
-          <input type="radio" name="brush" id="brush-eraser" value="Eraser" />
-          Eraser
-        </label>
       </div>
+      <br>
       <div>
       <canvas id="drawing-canvas" width="1000" height="200"></canvas>
       <!-- <img id="drawhere" alt="Draw here!" src="img/drawhere.png"> -->
-
-      <button id="data" width="200" height="40">Submit</canvas>
+      <br>
+      <button id="data" width="200" height="40">Submit</button>
+      <button id="undo" width="200" height="40">Undo</button>
+      <button id="redo" width="200" height="40">Redo</button>
+      <button id="clear" width="200" height="40">Clear</button>
+        <br>
         <p id="drawing-data" width="480" height="200"></canvas>
     </div><!-- app -->
     <input type='file' id="fileUpload" />
@@ -68,8 +60,8 @@
     <form id="frmUploader" enctype="multipart/form-data" action="api/Upload/" method="post">
         <input type="file" name="imgUploader" multiple />
         <input type="submit" name="submit" id="btnSubmit" value="Upload" /> </form>
-
-
+      </div>
+    </div>
 <script>
 
 function el(id){return document.getElementById(id);} // Get elem by ID
@@ -99,11 +91,7 @@ el("fileUpload").addEventListener("change", readImage, false);
         // We use the "before" event hook to update brush type right before drawing starts.
         mousedownBefore: function(elem, data, evt) {
           var brushType = getBrushType();
-          if (brushType == 'eraser') {
-            // There is a method to set the brush in eraser mode.
-            data.options.graphics.lineWidth = 20;
-            data.sketch.eraser();
-          } else if (brushType == 'pencil') {
+         if (brushType == 'pencil') {
             // There is a method to get the default mode (pencil) back.
             data.options.graphics.lineWidth = 3;
             data.sketch.pencil();
@@ -119,15 +107,29 @@ el("fileUpload").addEventListener("change", readImage, false);
       sketcher.handler(setIcon);
     });
 
+    document.getElementById('undo').addEventListener('click', function(evt) {
+    evt.preventDefault();
+    sketcher.memento.undo();
+  });
+
+  document.getElementById('redo').addEventListener('click', function(evt) {
+    evt.preventDefault();
+    sketcher.memento.redo();
+  });
+
+  document.getElementById('clear').addEventListener('click', function(evt) {
+      evt.preventDefault();
+      sketcher.clear();
+      outputEl.innerHTML = '';
+    });
+
     function getBrushType() {
       return document.querySelector('input[type=radio]:checked').value.toLowerCase();
     }
 
     function setIcon(elem, data) {
       var brushType = getBrushType();
-      if (brushType == 'eraser') {
-        // elem.style.cursor = 'url(img/broom.svg), auto';
-      } else if (brushType == 'pencil') {
+    if (brushType == 'pencil') {
         // elem.style.cursor = 'url(img/pencil.svg), auto';
       }
     }
@@ -176,19 +178,6 @@ function strokesToScg(strokes) {
 
 </script>
 
-
-
-<script>
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-3391370-12']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-</script>
 
 </body>
 
