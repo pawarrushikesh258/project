@@ -48,7 +48,7 @@
       <canvas id="drawing-canvas" width="1000" height="200"></canvas>
       <!-- <img id="drawhere" alt="Draw here!" src="img/drawhere.png"> -->
       <br>
-      <button id="data" width="200" height="40">Submit</button>
+      <!--<button id="data" width="200" height="40">Submit</button>-->
       <button id="undo" width="200" height="40">Undo</button>
       <button id="redo" width="200" height="40">Redo</button>
       <button id="clear" width="200" height="40">Clear</button>
@@ -56,6 +56,10 @@
         <p id="drawing-data" width="480" height="200"></canvas>
     </div><!-- app -->
     <input type='file' id="fileUpload" />
+
+      <form action="http://localhost:2000/api/test" method="post">
+          <button id="data" width="200" height="40">Submit</button>
+      </form>
 
     <form id="frmUploader" enctype="multipart/form-data" action="api/Upload/" method="post">
         <input type="file" name="imgUploader" multiple />
@@ -84,6 +88,7 @@ function readImage() {
 }
 
 el("fileUpload").addEventListener("change", readImage, false);
+
 (function() {
 
     var sketcher = new Sketchable('#drawing-canvas', {
@@ -149,14 +154,49 @@ var outputEl = document.getElementById('drawing-data');
       }
       var transformedStroke = transform(strokes);
       var scg = strokesToScg(transformedStroke);
+      var scgServer = strokesToScgServer(strokes);
+
+
+      //var postdata = {'strokes': JSON.stringify(postdata2)};
+
       p +='The following is SCG';
       p +='<br>';
       p += scg;
       console.log(scg);
       outputEl.innerHTML = p;
+
+      $.ajax({
+          method: "POST",
+          url: "http://localhost:2000/api/test",
+          data: scgServer,
+      }).done(function (res) {
+          console.log(res)
+      })
+
+
+      // var blob=new Blob([scg],{type:"text  /plain"});
+      //
+      // var xhr=new XMLHttpRequest();
+      //
+      //   xhr.onreadystatechange = () => {
+      //       //Call a function when the state changes.
+      //       if(xhr.readyState == 4 && xhr.status == 200) {
+      //           return callback(200 , xhr);
+      //       }else if(xhr.status == 400){
+      //           return callback(400, xhr);
+      //       }};
+      //
+      // xhr.open("GET","http://localhost:2000/api/test", true);
+      // // xhr.responseType="blob";
+      // xhr.setRequestHeader('Content-Type', 'text/plain');
+      // console.log(xhr.responseText);
+      //
+      // xhr.send();
+
     });
 
 })();
+
 function transform(strokes) {
   for (var i = 0; i < strokes.length; ++i)
     for (var j = 0, stroke = strokes[i]; j < stroke.length; ++j)
@@ -165,15 +205,28 @@ function transform(strokes) {
 };
 
 function strokesToScg(strokes) {
-  var scg = 'SCG_INK\n' + strokes.length + '\n'
+  var scg = 'SCG_INK\n' + strokes.length + '\n';
   strokes.forEach(function (stroke) {
-    scg += stroke.length + '\n'
+    scg += stroke.length + '\n';
     stroke.forEach(function (p) {
       scg += p[0] + ' ' + p[1] + '\n';
     })
-  })
+  });
 
   return scg;
+}
+
+function strokesToScgServer(strokes) {
+    var newline = "X";
+    var scg = 'SCG_INK'+ newline + strokes.length + newline;
+    strokes.forEach(function (stroke) {
+        scg += stroke.length + newline;
+        stroke.forEach(function (p) {
+            scg += p[0] + ' ' + p[1] + newline;
+        })
+    });
+
+    return scg;
 }
 
 </script>
