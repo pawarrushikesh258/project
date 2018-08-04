@@ -1,0 +1,20 @@
+user{
+
+first_name String
+last_name String
+username unique string
+email email
+password crypthash
+account_created Date
+Institue String
+res_count=1 INT
+}
+
+Results
+{
+user.username fk
+latex_op String
+image_path String
+
+}
+

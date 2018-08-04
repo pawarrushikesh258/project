@@ -12,7 +12,12 @@ ul, ol { margin-left:1em; }
 #drawhere, .drawhere { position:relative; top:-33px; z-index:-1; }
 #drawing-canvas, .drawing-canvas { position:relative; border:1px solid #000; }
 #drawing-data, .drawing-data { font-size:80%; text-align:left; }
+#outputarea{
 
+    margin-top: 50px;
+    margin-bottom: 50px;
+    font-size: 20pt;
+}
 .source-code { font-size:85%; }
 pre { background-color:#EEE; clear:both; border-top:1px dashed #666; border-bottom:1px dashed #666; }
 .tryme { padding:.5em; }

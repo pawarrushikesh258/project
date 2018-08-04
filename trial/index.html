@@ -22,7 +22,14 @@
   <script type="application/javascript" src="jquery.sketchable.full.min.js"></script>
   <script type="application/javascript" src="jquery.sketchable.memento.min.js"></script>
   <script type="application/javascript" src="jquery.sketchable.min.js"></script>
-
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js">
+      MathJax.Hub.Config({
+          extensions: ["tex2jax.js"],
+          jax: ["input/TeX","output/HTML-CSS"],
+          tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
+      });
+  </script>
 </head>
 
 <body>
@@ -49,12 +56,21 @@
       <!-- <img id="drawhere" alt="Draw here!" src="img/drawhere.png"> -->
       <br>
       <!--<button id="data" width="200" height="40">Submit</button>-->
-      <button id="undo" width="200" height="40">Undo</button>
+      <button class="active" id="undo" width="200" height="40">Undo</button>
       <button id="redo" width="200" height="40">Redo</button>
       <button id="clear" width="200" height="40">Clear</button>
         <br>
         <p id="drawing-data" width="480" height="200"></canvas>
-    </div><!-- app -->
+    </div>
+
+        <div id="outputarea">
+
+            Expression Is: ${}$
+
+        </div>
+        <!-- app -->
+
+
     <input type='file' id="fileUpload" />
 
       <form action="http://localhost:2000/api/test" method="post">
@@ -66,7 +82,13 @@
         <input type="submit" name="submit" id="btnSubmit" value="Upload" /> </form>
       </div>
     </div>
+
+
+
+
 <script>
+
+
 
 function el(id){return document.getElementById(id);} // Get elem by ID
 
@@ -150,7 +172,7 @@ var outputEl = document.getElementById('drawing-data');
           var point = stroke[j];
           p += '(' + point[0] + ',' + point[1] + ')';
         }
-        p += '<br>';
+        //p += '<br>';
       }
       var transformedStroke = transform(strokes);
       var scg = strokesToScg(transformedStroke);
@@ -163,35 +185,37 @@ var outputEl = document.getElementById('drawing-data');
       p +='<br>';
       p += scg;
       console.log(scg);
-      outputEl.innerHTML = p;
+      //outputEl.innerHTML = p;
 
-      $.ajax({
-          method: "POST",
-          url: "http://localhost:2000/api/test",
-          data: scgServer,
-      }).done(function (res) {
-          console.log(res)
-      })
+      // $.ajax({
+      //     method: "POST",
+      //     url: "http://localhost:2000/api/test",
+      //     async: false,
+      //     data: scgServer,
+      // }).done(function (res) {
+      //     console.log(res)
+      // })
 
 
-      // var blob=new Blob([scg],{type:"text  /plain"});
-      //
-      // var xhr=new XMLHttpRequest();
-      //
-      //   xhr.onreadystatechange = () => {
-      //       //Call a function when the state changes.
-      //       if(xhr.readyState == 4 && xhr.status == 200) {
-      //           return callback(200 , xhr);
-      //       }else if(xhr.status == 400){
-      //           return callback(400, xhr);
-      //       }};
-      //
-      // xhr.open("GET","http://localhost:2000/api/test", true);
-      // // xhr.responseType="blob";
-      // xhr.setRequestHeader('Content-Type', 'text/plain');
-      // console.log(xhr.responseText);
-      //
-      // xhr.send();
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:2000/getstrokeresult",
+            data: {"scgdata":scgServer},
+            success: (result,status)=>{
+
+
+                UpdateMath(result);
+
+                //let op=JSON.stringify(result.data);
+                //document.getElementById("outputarea").innerHTML=result;
+               console.log("Type of Result is", typeof(result));
+                console.log("STATUS", status);
+            },
+            error: (error,status)=>{
+                console.log("Error", error);
+                console.log("STATUS", status);
+            }
+        })
 
     });
 
@@ -230,6 +254,32 @@ function strokesToScgServer(strokes) {
 }
 
 </script>
+
+  <script>
+      //
+      //  Use a closure to hide the local variables from the
+      //  global namespace
+      //
+      (function () {
+          var QUEUE = MathJax.Hub.queue;  // shorthand for the queue
+          var math = null;                // the element jax for the math output.
+
+          //
+          //  Get the element jax when MathJax has produced it.
+          //
+          QUEUE.Push(function () {
+              math = MathJax.Hub.getAllJax("outputarea")[0];
+          });
+
+          //
+          //  The onchange event handler that typesets the
+          //  math entered by the user
+          //
+          window.UpdateMath = function (TeX) {
+              QUEUE.Push(["Text",math,"\\displaystyle{"+TeX+"}"]);
+          }
+      })();
+  </script>
 
 
 </body>
